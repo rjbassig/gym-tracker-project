@@ -35,6 +35,10 @@ function Home() {
     );
   };
 
+  const startWorkout = (workout) => {
+    setActiveWorkout(workout);
+  };
+
   return (
     <main style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
       <div style={{ marginBottom: "40px" }}>
@@ -46,20 +50,21 @@ function Home() {
       </div>
 
       <div style={{ marginBottom: "40px" }}>
-        {activeWorkout ? (
-          <ActiveWorkout
-            workout={activeWorkout}
-            setActiveWorkout={setActiveWorkout}
-          />
-        ) : (
-          <WorkoutList
-            workouts={workouts}
-            onAddWorkout={addWorkout}
-            onDeleteWorkout={deleteWorkout}
-            onStartWorkout={setActiveWorkout}
-          />
-        )}
+        <WorkoutList
+          workouts={workouts}
+          onAddWorkout={addWorkout}
+          onDeleteWorkout={deleteWorkout}
+          onStartWorkout={startWorkout}
+          activeWorkout={activeWorkout}
+        />
       </div>
+
+      {activeWorkout && (
+        <ActiveWorkout
+          workout={activeWorkout}
+          setActiveWorkout={setActiveWorkout}
+        />
+      )}
     </main>
   );
 }

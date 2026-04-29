@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-function WorkoutList({ workouts, onAddWorkout, onDeleteWorkout, onStartWorkout }) {
+function WorkoutList({ workouts, onAddWorkout, onDeleteWorkout, onStartWorkout, activeWorkout }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workoutName, setWorkoutName] = useState("");
   const [exercises, setExercises] = useState([
@@ -16,6 +16,10 @@ function WorkoutList({ workouts, onAddWorkout, onDeleteWorkout, onStartWorkout }
   const closeModal = () => {
     resetForm();
     setIsModalOpen(false);
+  };
+
+  const handleStartWorkout = (workout) => {
+    onStartWorkout(workout);
   };
 
   const addExercise = () => {
@@ -210,32 +214,50 @@ function WorkoutList({ workouts, onAddWorkout, onDeleteWorkout, onStartWorkout }
               </div>
 
               <div style={{ display: "flex", gap: "8px", marginTop: "14px" }}>
-                <button
-                  type="button"
-                  onClick={() => onStartWorkout(workout)}
-                  style={{
-                    flex: 1,
-                    padding: "9px",
-                    borderRadius: "8px",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Start
-                </button>
+                {activeWorkout && activeWorkout.id === workout.id ? (
+                  <button
+                    type="button"
+                    style={{
+                      width: "100%",
+                      padding: "9px",
+                      borderRadius: "8px",
+                      border: "none",
+                      cursor: "default",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Active Workout
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleStartWorkout(workout)}
+                      style={{
+                        flex: 1,
+                        padding: "9px",
+                        borderRadius: "8px",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Start
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => onDeleteWorkout(workout.id)}
-                  style={{
-                    padding: "9px 10px",
-                    borderRadius: "8px",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Delete
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteWorkout(workout.id)}
+                      style={{
+                        padding: "9px 10px",
+                        borderRadius: "8px",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

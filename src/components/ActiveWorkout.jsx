@@ -130,7 +130,14 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: 999,
+      }}
+    >
       <div
         onClick={() => setIsExpanded(true)}
         style={{
@@ -147,12 +154,14 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
           justifyContent: "space-between",
           alignItems: "center",
           cursor: "pointer",
+          pointerEvents: "auto",
           zIndex: 999,
+          boxShadow: "0 12px 30px rgba(0, 0, 0, 0.35)",
         }}
       >
         <div>
           <div style={{ fontSize: "12px", opacity: 0.7 }}>Active Workout</div>
-          <strong>Insert: {workout.name}</strong>
+          <strong>{workout.name}</strong>
         </div>
 
         <div style={{ fontWeight: "bold", fontSize: "18px" }}>
@@ -170,6 +179,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
             alignItems: "center",
             justifyContent: "center",
             padding: "20px",
+            pointerEvents: "auto",
             zIndex: 1000,
           }}
         >
