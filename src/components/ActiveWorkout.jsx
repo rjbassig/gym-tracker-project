@@ -35,14 +35,14 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   }, [restTimer]);
 
   const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${String(s).padStart(2, "0")}`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
   };
 
   const updateSet = (exerciseIndex, setIndex, field, value) => {
-    setSessionExercises((prev) =>
-      prev.map((exercise, currentExerciseIndex) =>
+    setSessionExercises((prevExercises) =>
+      prevExercises.map((exercise, currentExerciseIndex) =>
         currentExerciseIndex === exerciseIndex
           ? {
               ...exercise,
@@ -56,8 +56,8 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   };
 
   const toggleCompleted = (exerciseIndex, setIndex) => {
-    setSessionExercises((prev) =>
-      prev.map((exercise, currentExerciseIndex) =>
+    setSessionExercises((prevExercises) =>
+      prevExercises.map((exercise, currentExerciseIndex) =>
         currentExerciseIndex === exerciseIndex
           ? {
               ...exercise,
@@ -73,8 +73,8 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   };
 
   const addSet = (exerciseIndex) => {
-    setSessionExercises((prev) =>
-      prev.map((exercise, currentExerciseIndex) =>
+    setSessionExercises((prevExercises) =>
+      prevExercises.map((exercise, currentExerciseIndex) =>
         currentExerciseIndex === exerciseIndex
           ? {
               ...exercise,
@@ -89,8 +89,8 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   };
 
   const toggleUnit = (exerciseIndex, setIndex) => {
-    setSessionExercises((prev) =>
-      prev.map((exercise, currentExerciseIndex) =>
+    setSessionExercises((prevExercises) =>
+      prevExercises.map((exercise, currentExerciseIndex) =>
         currentExerciseIndex === exerciseIndex
           ? {
               ...exercise,
@@ -110,8 +110,8 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   };
 
   const finishWorkout = () => {
-    const saved = localStorage.getItem("workoutHistory");
-    const history = saved ? JSON.parse(saved) : [];
+    const savedHistory = localStorage.getItem("workoutHistory");
+    const workoutHistory = savedHistory ? JSON.parse(savedHistory) : [];
 
     const completedWorkout = {
       id: crypto.randomUUID(),
@@ -123,22 +123,16 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
 
     localStorage.setItem(
       "workoutHistory",
-      JSON.stringify([...history, completedWorkout])
+      JSON.stringify([...workoutHistory, completedWorkout])
     );
 
     setActiveWorkout(null);
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        pointerEvents: "none",
-        zIndex: 999,
-      }}
-    >
-      <div
+    <>
+      <button
+        type="button"
         onClick={() => setIsExpanded(true)}
         style={{
           position: "fixed",
@@ -148,18 +142,19 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
           width: "90%",
           maxWidth: "600px",
           background: "#1e1e1e",
+          color: "inherit",
           padding: "14px",
           borderRadius: "12px",
+          border: "none",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           cursor: "pointer",
-          pointerEvents: "auto",
-          zIndex: 999,
+          zIndex: 5000,
           boxShadow: "0 12px 30px rgba(0, 0, 0, 0.35)",
         }}
       >
-        <div>
+        <div style={{ textAlign: "left" }}>
           <div style={{ fontSize: "12px", opacity: 0.7 }}>Active Workout</div>
           <strong>{workout.name}</strong>
         </div>
@@ -167,7 +162,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
         <div style={{ fontWeight: "bold", fontSize: "18px" }}>
           {formatTime(elapsedSeconds)}
         </div>
-      </div>
+      </button>
 
       {isExpanded && (
         <div
@@ -179,8 +174,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
             alignItems: "center",
             justifyContent: "center",
             padding: "20px",
-            pointerEvents: "auto",
-            zIndex: 1000,
+            zIndex: 6000,
           }}
         >
           <div
@@ -199,6 +193,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: "16px",
                 marginBottom: "18px",
               }}
             >
@@ -209,7 +204,15 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
                 </p>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
                 <button type="button" onClick={() => startRest(120)}>2m</button>
                 <button type="button" onClick={() => startRest(180)}>3m</button>
                 <button type="button" onClick={() => startRest(240)}>4m</button>
@@ -433,7 +436,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
