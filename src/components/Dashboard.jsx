@@ -38,8 +38,10 @@ function Dashboard({ workouts = [] }) {
         background: "#1e1e1e",
         padding: "16px",
         borderRadius: "12px",
-        maxWidth: "520px", // keeps it small
         width: "100%",
+        maxWidth: "800px",
+        margin: "0 auto",
+        boxSizing: "border-box",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
