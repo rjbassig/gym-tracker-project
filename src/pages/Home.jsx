@@ -36,7 +36,22 @@ function Home() {
   };
 
   const startWorkout = (workout) => {
-    setActiveWorkout(workout);
+    const latestWorkout = workouts.find(
+      (savedWorkout) => savedWorkout.id === workout.id
+    );
+
+    setActiveWorkout(latestWorkout || workout);
+  };
+
+  const updateWorkoutTemplate = (updatedWorkout) => {
+    setWorkouts((prevWorkouts) => {
+      const updatedWorkouts = prevWorkouts.map((workout) =>
+        workout.id === updatedWorkout.id ? updatedWorkout : workout
+      );
+
+      localStorage.setItem("workouts", JSON.stringify(updatedWorkouts));
+      return updatedWorkouts;
+    });
   };
 
   return (
@@ -63,6 +78,7 @@ function Home() {
         <ActiveWorkout
           workout={activeWorkout}
           setActiveWorkout={setActiveWorkout}
+          onUpdateWorkoutTemplate={updateWorkoutTemplate}
         />
       )}
     </main>

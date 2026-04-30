@@ -19,7 +19,13 @@ function WorkoutList({ workouts, onAddWorkout, onDeleteWorkout, onStartWorkout, 
   };
 
   const handleStartWorkout = (workout) => {
-    onStartWorkout(workout);
+    const savedWorkouts = localStorage.getItem("workouts");
+    const latestWorkouts = savedWorkouts ? JSON.parse(savedWorkouts) : workouts;
+
+    const latestWorkout =
+      latestWorkouts.find((savedWorkout) => savedWorkout.id === workout.id) || workout;
+
+    onStartWorkout(latestWorkout);
   };
 
   const addExercise = () => {
@@ -65,26 +71,6 @@ function WorkoutList({ workouts, onAddWorkout, onDeleteWorkout, onStartWorkout, 
               sets: exercise.sets.map((set, currentSetIndex) =>
                 currentSetIndex === setIndex ? { ...set, [field]: value } : set
               ),
-            }
-          : exercise
-      )
-    );
-  };
-
-  const adjustSetWeight = (exerciseIndex, setIndex, amount) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise, index) =>
-        index === exerciseIndex
-          ? {
-              ...exercise,
-              sets: exercise.sets.map((set, currentSetIndex) => {
-                if (currentSetIndex !== setIndex) return set;
-
-                const currentWeight = Number(set.weight) || 0;
-                const nextWeight = Math.max(0, currentWeight + amount);
-
-                return { ...set, weight: String(nextWeight) };
-              }),
             }
           : exercise
       )

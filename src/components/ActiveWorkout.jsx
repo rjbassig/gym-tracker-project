@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function ActiveWorkout({ workout, setActiveWorkout }) {
+function ActiveWorkout({ workout, setActiveWorkout, onUpdateWorkoutTemplate }) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const [restTimer, setRestTimer] = useState(0);
@@ -54,6 +54,27 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
       )
     );
   };
+
+  const updateExerciseName = (exerciseIndex, value) => {
+    setSessionExercises((prevExercises) =>
+      prevExercises.map((exercise, currentExerciseIndex) =>
+        currentExerciseIndex === exerciseIndex
+          ? { ...exercise, name: value }
+          : exercise
+      )
+    );
+  };
+
+  const getSavedExercises = () =>
+    sessionExercises.map((exercise) => ({
+      name: exercise.name.trim(),
+      sets: exercise.sets.map((set) => ({
+        weight: Number(set.weight) || 0,
+        reps: Number(set.reps) || 0,
+        unit: set.unit || "lbs",
+        completed: Boolean(set.completed),
+      })),
+    }));
 
   const toggleCompleted = (exerciseIndex, setIndex) => {
     setSessionExercises((prevExercises) =>
@@ -110,21 +131,49 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
   };
 
   const finishWorkout = () => {
+    const cleanedExercises = getSavedExercises().map((exercise) => ({
+      name: exercise.name,
+      sets: exercise.sets.map((set) => ({
+        weight: Number(set.weight) || 0,
+        reps: Number(set.reps) || 0,
+        unit: set.unit || "lbs",
+      })),
+    }));
+
+    const updatedTemplate = {
+      ...workout,
+      exercises: cleanedExercises,
+    };
+
     const savedHistory = localStorage.getItem("workoutHistory");
     const workoutHistory = savedHistory ? JSON.parse(savedHistory) : [];
 
     const completedWorkout = {
       id: crypto.randomUUID(),
+      workoutId: workout.id,
       name: workout.name,
       date: new Date().toISOString(),
       duration: elapsedSeconds,
-      exercises: sessionExercises,
+      exercises: cleanedExercises,
     };
 
     localStorage.setItem(
       "workoutHistory",
       JSON.stringify([...workoutHistory, completedWorkout])
     );
+
+    const savedWorkouts = localStorage.getItem("workouts");
+    const workouts = savedWorkouts ? JSON.parse(savedWorkouts) : [];
+
+    const updatedWorkouts = workouts.map((savedWorkout) =>
+      savedWorkout.id === workout.id ? updatedTemplate : savedWorkout
+    );
+
+    localStorage.setItem("workouts", JSON.stringify(updatedWorkouts));
+
+    if (onUpdateWorkoutTemplate) {
+      onUpdateWorkoutTemplate(updatedTemplate);
+    }
 
     setActiveWorkout(null);
   };
@@ -266,7 +315,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
 
             {sessionExercises.map((exercise, exerciseIndex) => (
               <div
-                key={`${exercise.name}-${exerciseIndex}`}
+                key={exerciseIndex}
                 style={{
                   background: "#2a2a2a",
                   borderRadius: "12px",
@@ -277,7 +326,10 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
                 <input
                   type="text"
                   value={exercise.name}
-                  readOnly
+                  onChange={(event) =>
+                    updateExerciseName(exerciseIndex, event.target.value)
+                  }
+                  placeholder="Exercise name"
                   style={{
                     width: "100%",
                     boxSizing: "border-box",
@@ -333,7 +385,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
                             exerciseIndex,
                             setIndex,
                             "weight",
-                            Number(event.target.value) || 0
+                            event.target.value
                           )
                         }
                         placeholder="weight"
@@ -370,7 +422,7 @@ function ActiveWorkout({ workout, setActiveWorkout }) {
                           exerciseIndex,
                           setIndex,
                           "reps",
-                          Number(event.target.value) || 0
+                          event.target.value
                         )
                       }
                       placeholder="reps"
