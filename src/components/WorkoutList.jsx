@@ -180,6 +180,52 @@ function WorkoutList({
       return;
     }
 
+    const hasAnyExerciseContent = exercises.some((exercise) => {
+      const hasExerciseName = exercise.name.trim() !== "";
+      const hasAnySetContent = exercise.sets.some(
+        (set) => String(set.weight).trim() !== "" || String(set.reps).trim() !== ""
+      );
+
+      return hasExerciseName || hasAnySetContent;
+    });
+
+    if (!hasAnyExerciseContent) {
+      setFormError("Workout cannot be empty.");
+      return;
+    }
+
+    for (const exercise of exercises) {
+      const exerciseName = exercise.name.trim();
+      const hasAnySetContent = exercise.sets.some(
+        (set) => String(set.weight).trim() !== "" || String(set.reps).trim() !== ""
+      );
+
+      if (!exerciseName && hasAnySetContent) {
+        setFormError("Exercise name missing.");
+        return;
+      }
+
+      if (exerciseName && !hasAnySetContent) {
+        setFormError("Weight and reps missing.");
+        return;
+      }
+
+      for (const set of exercise.sets) {
+        const weightValue = String(set.weight).trim();
+        const repsValue = String(set.reps).trim();
+
+        if (exerciseName && weightValue === "" && repsValue !== "") {
+          setFormError("Weight missing.");
+          return;
+        }
+
+        if (exerciseName && weightValue !== "" && repsValue === "") {
+          setFormError("Reps missing.");
+          return;
+        }
+      }
+    }
+
     const cleanedExercises = exercises
       .map((exercise) => ({
         name: exercise.name.trim(),
@@ -191,7 +237,7 @@ function WorkoutList({
           }))
           .filter((set) => set.weight > 0 || set.reps > 0),
       }))
-      .filter((exercise) => exercise.name !== "");
+      .filter((exercise) => exercise.name !== "" && exercise.sets.length > 0);
 
     const workoutPayload = {
       id: editingWorkoutId,
