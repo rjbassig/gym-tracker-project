@@ -70,6 +70,7 @@ function Home() {
           onAddWorkout={addWorkout}
           onDeleteWorkout={deleteWorkout}
           onStartWorkout={startWorkout}
+          onUpdateWorkout={updateWorkoutTemplate}
           activeWorkout={activeWorkout}
         />
       </div>
